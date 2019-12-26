@@ -1,18 +1,16 @@
 import { CustomAuthorizerEvent, CustomAuthorizerResult } from 'aws-lambda'
 import 'source-map-support/register'
 
-import { verify, decode } from 'jsonwebtoken'
+import { verify, decode, Secret } from 'jsonwebtoken'
 import { createLogger } from '../../utils/logger'
 import Axios from 'axios'
 import { Jwt } from '../../auth/Jwt'
+import { Jwks, Key } from '../../auth/Jwks'
 import { JwtPayload } from '../../auth/JwtPayload'
 
 const logger = createLogger('auth')
 
-// TODO: Provide a URL that can be used to download a certificate that can be used
-// to verify JWT token signature.
-// To get this URL you need to go to an Auth0 page -> Show Advanced Settings -> Endpoints -> JSON Web Key Set
-const jwksUrl = '...'
+const jwksUrl = 'https://dev-h22b0uti.eu.auth0.com/.well-known/jwks.json'
 
 export const handler = async (
   event: CustomAuthorizerEvent
@@ -54,14 +52,41 @@ export const handler = async (
   }
 }
 
-async function verifyToken(authHeader: string): Promise<JwtPayload> {
-  const token = getToken(authHeader)
-  const jwt: Jwt = decode(token, { complete: true }) as Jwt
+/**
+ * Taken from https://gist.github.com/chatu/7738411c7e8dcf604bc5a0aad7937299
+ * @param cert 
+ */
+const certToPEM = (cert: string): Secret => {
+  cert = cert.match(/.{1,64}/g).join('\n');
+  cert = `-----BEGIN CERTIFICATE-----\n${cert}\n-----END CERTIFICATE-----\n`;
+  return cert;
+}
 
-  // TODO: Implement token verification
-  // You should implement it similarly to how it was implemented for the exercise for the lesson 5
-  // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
-  return undefined
+/**
+ * Asymetric JWT verifier based on steps from https://auth0.com/blog/navigating-rs256-and-jwks/
+ * @param authHeader 
+ */
+async function verifyToken(authHeader: string): Promise<JwtPayload> {
+  try {
+    // Retrieve the JWKS and filter for potential signing keys
+    const jwks: Jwks = await Axios.get(jwksUrl);
+    // Extract the JWT from the request's authorization header.
+    const token = getToken(authHeader)
+    const jwt: Jwt = decode(token, { complete: true }) as Jwt
+    // Decode the JWT and grab the kid property from the header.
+    const authHdrKid = jwt.header.kid;
+    // Find a signing key in the filtered JWKS with a matching kid property
+    const signingKey: Key = jwks.keys.filter(key => key.kid == authHdrKid)[0]
+    // Using the x5c property build a certificate which will be used to verify the JWT signature.
+    const pem = certToPEM(signingKey.x5c[0])
+    // Ensure the JWT contains the expected audience, issuer, expiration, etc.
+    verify(token, pem);
+    // This is async function, so return the result as a promise that resolves to the payload
+    return Promise.resolve(jwt.payload);
+  }
+  catch (e) {
+    logger.error(e)
+  }
 }
 
 function getToken(authHeader: string): string {
