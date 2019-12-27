@@ -92,6 +92,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
   async componentDidMount() {
     try {
       const todos = await getTodos(this.props.auth.getIdToken())
+      console.log('here',{todos})
       this.setState({
         todos,
         loadingTodos: false
@@ -157,6 +158,8 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
   }
 
   renderTodosList() {
+    const state = this.state;
+    console.log({state})
     const todos = this.state.todos;
     return (
       <Grid padded>

@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { createLogger } from '../../utils/logger'
 const logger = createLogger('http')
 import { DynamoDB } from 'aws-sdk';
+import { getUserIdFromJwt } from '../../auth/utils';
 const docClient = new DynamoDB.DocumentClient();
 const TODO_TABLE = process.env.TODO_TABLE
 
@@ -21,12 +22,14 @@ interface TODO {
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
   try {
+
     const { name, dueDate }: CreateTodoRequest = JSON.parse(event.body)
+    const userId = getUserIdFromJwt(event);
 
     // Construct new TODO object
     const newTodo: TODO = {
       todoId: uuid(),
-      userId: '',
+      userId,
       createdAt: JSON.stringify(new Date()),
       name,
       dueDate,
@@ -48,7 +51,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       headers: {
         'Access-Control-Allow-Origin': '*'
       },
-      body: ''
+      body: JSON.stringify({item:newTodo})
     }
   }
   catch (e) {
