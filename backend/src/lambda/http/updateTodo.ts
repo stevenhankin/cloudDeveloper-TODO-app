@@ -20,7 +20,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     const params = {
       TableName: TODO_TABLE,
       Key: { todoId },
-      UpdateExpression: 'set name = :n, dueDate = :due, done = :done',
+      UpdateExpression: 'set attachmentUrl = :u, dueDate = :due, done = :done',
       ExpressionAttributeValues: {
         ':n': updatedTodo.name,
         ':due': updatedTodo.dueDate,

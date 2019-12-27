@@ -66,7 +66,8 @@ export async function getUploadUrl(
       'Authorization': `Bearer ${idToken}`
     }
   })
-  return response.data.uploadUrl
+  console.log('response from get upload url svc', {response})
+  return Promise.resolve(response.data.uploadUrl)
 }
 
 export async function uploadFile(uploadUrl: string, file: Buffer): Promise<void> {

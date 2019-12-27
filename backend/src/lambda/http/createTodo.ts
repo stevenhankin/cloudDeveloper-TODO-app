@@ -34,7 +34,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       name,
       dueDate,
       done: false,
-      attachmentUrl: 'http://example.com/image.png'
+      attachmentUrl: ''
     }
 
     const params = {

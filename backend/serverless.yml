@@ -19,15 +19,13 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:DeleteItem
-      Resource:  'arn:aws:dynamodb:eu-west-2:*:*'
-
+      Resource: "arn:aws:dynamodb:eu-west-2:*:*"
 
   environment:
     TODO_TABLE: Todo-${self:provider.stage}
     FILE_UPLOAD_S3_BUCKET: steves-file-upload-bucket-${self:provider.stage}
 
 functions:
-
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
 
@@ -63,18 +61,16 @@ functions:
           path: todos/{todoId}
           cors: true
 
-  # TODO: Configure this function
-  # GenerateUploadUrl:
-  #   handler: src/lambda/http/generateUploadUrl.handler
-  #   events:
-  #     - http:
-  #         method: post
-  #         path: todos/{todoId}/attachment
-          # cors: true
+  GenerateUploadUrl:
+    handler: src/lambda/http/generateUploadUrl.handler
+    events:
+      - http:
+          method: post
+          path: todos/{todoId}/attachment
+          cors: true
 
 resources:
   Resources:
-    # TODO: Add any necessary AWS resources
     TodoDynamoDBTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -87,26 +83,24 @@ resources:
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TODO_TABLE}
 
-    
     UploadBucket:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:provider.environment.FILE_UPLOAD_S3_BUCKET}
         CorsConfiguration:
           CorsRules:
-            - 
-              AllowedOrigins:
-                - '*'
+            - AllowedOrigins:
+                - "*"
               AllowedHeaders:
-                - '*'
+                - "*"
               AllowedMethods:
                 - GET
                 - PUT
                 - POST
-                - DELETE 
+                - DELETE
                 - HEAD
               MaxAge: 3000
-    
+
     BucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
@@ -116,7 +110,7 @@ resources:
           Statement:
             - Sid: PublicReadForGetBucketObjects
               Effect: Allow
-              Principal: '*'
-              Action: 's3:GetObject'
-              Resource: 'arn:aws:s3:::${self:provider.environment.FILE_UPLOAD_S3_BUCKET}/*'
-        Bucket: {Ref: UploadBucket}
+              Principal: "*"
+              Action: ["s3:GetObject","s3:Put*"]
+              Resource: "arn:aws:s3:::${self:provider.environment.FILE_UPLOAD_S3_BUCKET}/*"
+        Bucket: { Ref: UploadBucket }
