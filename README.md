@@ -28,7 +28,12 @@ sls deploy -v --aws-profile serverless --aws-region eu-west-2
 
 
 ## Screenshots
-![Image](screenshots/please-login.png)
-![Image](screenshots/auth0-challenge.png)
-![Image](screenshots/example-todo-list.png)
 
+### Before authorisation
+<img src="screenshots/please-login.png" width="600">
+
+### Auth0 asking user to authenticate
+<img src="screenshots/auth0-challenge.png" width="600">
+
+### Sample list of TODOs and an uploaded image
+<img src="screenshots/example-todo-list.png" width="600">
