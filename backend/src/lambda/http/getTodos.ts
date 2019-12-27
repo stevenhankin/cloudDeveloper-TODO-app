@@ -10,26 +10,28 @@ const TODO_TABLE = process.env.TODO_TABLE
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
   // TODO: Get all TODO items for a current user
-  logger.info('getTodos',{event})
+  logger.info('getTodos', { event })
 
   try {
 
     const params = {
       TableName: TODO_TABLE,
-      FilterExpression: 'user=:u',
-      ExpressionAttributeValues: { ':u': '' } // TODO : specify current user
+      FilterExpression: 'userId=:u',
+      ExpressionAttributeValues: { ':u': 'steve' } // TODO : specify current user
     };
 
-    await docClient.scan(params).promise();
+    const result = await docClient.scan(params).promise();
+
+    logger.info('scan result', { result })
 
     // SUCCESS
     logger.info('✅ Scanned TODO');
     return {
-      statusCode: 204,
+      statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*'
       },
-      body: ''
+      body: JSON.stringify(result.Items)
     }
   }
   catch (e) {
