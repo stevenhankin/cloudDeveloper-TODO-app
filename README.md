@@ -17,6 +17,8 @@ cd client
 npm install
 npm start
 ```
+The client should automatically start in your browser and load from http://localhost:3000
+
 
 ## Things I've learnt on this project
 * Serverless framework
