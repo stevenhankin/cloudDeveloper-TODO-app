@@ -18,13 +18,23 @@ npm install
 npm start
 ```
 
+## Things I've learnt on this project
+* Serverless framework
+* Lambdas
+* DynamoDB
+* Presigned URLs for unconstrained uploads
+* S3 Bucket storage
+* Optimisations ()
+
 
 ## Deploying your own Serverless App on AWS
 This assumes that you already have an AWS Profile called *serverless* and are using *eu-west-2* region
 (obviously you can substitute your own settings as required)
 ```
+export NODE_OPTIONS=--max_old_space_size=4096
 sls deploy -v --aws-profile serverless --aws-region eu-west-2
 ```
+:warning: Note that NODE_OPTIONS is required for the _individually_ packaging option in *serverless.yml* to avoid Out Of Memory issues 
 
 
 ## Screenshots
