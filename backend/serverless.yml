@@ -19,6 +19,7 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:DeleteItem
+        - dynamodb:UpdateItem
       Resource: "arn:aws:dynamodb:eu-west-2:*:*"
 
   environment:

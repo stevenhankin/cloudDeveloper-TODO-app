@@ -6,6 +6,10 @@ import { DynamoDB } from 'aws-sdk';
 const docClient = new DynamoDB.DocumentClient();
 const TODO_TABLE = process.env.TODO_TABLE
 
+/**
+ * Deletes a TODO for the specified todoId
+ * @param event 
+ */
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const todoId = event.pathParameters.todoId
 
